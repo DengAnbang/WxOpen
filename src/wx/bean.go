@@ -69,3 +69,20 @@ type ImageResponseBody struct {
 		MediaId CDATA
 	}
 }
+
+type NewsResponseBody struct {
+	BaseBody
+	ArticleCount int32
+	Articles     Articles
+}
+
+type Articles struct {
+	Item ArticlesItem `xml:"item"`
+}
+
+type ArticlesItem struct {
+	Title       CDATA
+	Description CDATA
+	PicUrl      CDATA
+	Url         CDATA
+}

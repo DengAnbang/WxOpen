@@ -38,3 +38,20 @@ func SendImageMessage(w http.ResponseWriter, m xmlutil.StringMap, MediaId string
 	loge.W(err)
 	w.Write([]byte(""))
 }
+
+func SendNewsMessage(w http.ResponseWriter, m xmlutil.StringMap, articlesItem ArticlesItem) {
+	body := NewsResponseBody{
+		BaseBody:     GetReplyBaseBody("news", m),
+		ArticleCount: 1,
+		Articles:     Articles{Item: articlesItem},
+	}
+	bytes, err := xml.Marshal(body)
+	s := string(bytes)
+	loge.W(s)
+	if err == nil {
+		w.Write(bytes)
+		return
+	}
+	loge.W(err)
+	w.Write([]byte(""))
+}

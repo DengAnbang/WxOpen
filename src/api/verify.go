@@ -60,9 +60,14 @@ func MenuCreate(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		wx.Menu{
-			Type: "click",
-			Name: "今日歌曲",
-			Key:  "V1001_TODAY_MUSIC",
+			Name: "菜单2",
+			SubButton: []wx.SubButton{
+				{
+					Type: "click",
+					Name: "发送图文消息",
+					Key:  code.KEY_SEND_NEWS,
+				},
+			},
 		},
 	)
 	button := wx.Button{Menu: menus}
