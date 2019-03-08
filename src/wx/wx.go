@@ -55,107 +55,13 @@ func (accessToken *AccessToken) Refresh() error {
 	return nil
 }
 
-//func UploaImage(body1 []byte) (mediaid map[string]interface{}, err error) {
-//	mapQr := make(map[string]interface{})
-//	body := &bytes.Buffer{}
-//	writer := multipart.NewWriter(body)
-//	part, err := writer.CreateFormFile("image", "qr.jpg")
-//	if err != nil {
-//		return
-//	}
-//	_, err = io.Copy(part, bytes.NewReader(body1))
-//	err = writer.Close()
-//	if err != nil {
-//		return
-//	}
-//
-//	req, err := http.NewRequest("POST", "https://qyapi.weixin.qq.com/cgi-bin/media/upload", body)
-//	req.Header.Add("Content-Type", writer.FormDataContentType())
-//	urlQuery := req.URL.Query()
-//	if err != nil {
-//		return
-//	}
-//	urlQuery.Add("access_token", AccessTokenBean.AccessToken)
-//	urlQuery.Add("type", "image")
-//
-//	req.URL.RawQuery = urlQuery.Encode()
-//	client := http.Client{}
-//	res, err := client.Do(req)
-//	if err != nil {
-//		return
-//	}
-//	defer res.Body.Close()
-//	jsonbody, _ := ioutil.ReadAll(res.Body)
-//	err = json.Unmarshal(jsonbody, &mapQr)
-//	if err != nil {
-//		loge.W(err)
-//		return mapQr, err
-//	}
-//	return
-//}
-//type MediaUpload struct {
-//	ErrCode   int    `json:"errcode"`
-//	ErrMgs    string `json:"errmsg"`
-//	Type      string `json:"type"`
-//	MediaID   string `json:"media_id"`
-//	CreatedAt string `json:"created_at"`
-//}
-//
-//func UploaImage(token, imagePath string) (mediaid string, err error) {
-//	file, err := os.Open(imagePath)
-//	if err != nil {
-//		return
-//	}
-//	defer file.Close()
-//	body := &bytes.Buffer{}
-//	writer := multipart.NewWriter(body)
-//	part, err := writer.CreateFormFile("image", filepath.Base(imagePath))
-//	if err != nil {
-//		return
-//	}
-//	_, err = io.Copy(part, file)
-//	err = writer.Close()
-//	if err != nil {
-//		return
-//	}
-//
-//	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/media/upload", body)
-//	req.Header.Add("Content-Type", writer.FormDataContentType())
-//	urlQuery := req.URL.Query()
-//	if err != nil {
-//		return
-//	}
-//	urlQuery.Add("access_token", token)
-//	urlQuery.Add("type", "image")
-//
-//	req.URL.RawQuery = urlQuery.Encode()
-//	client := http.Client{}
-//	res, err := client.Do(req)
-//	if err != nil {
-//		return
-//	}
-//	defer res.Body.Close()
-//	jsonbody, _ := ioutil.ReadAll(res.Body)
-//	media := MediaUpload{}
-//	err = json.Unmarshal(jsonbody, &media)
-//	if err != nil {
-//		return
-//	}
-//	if media.MediaID == "" {
-//		err = errors.New(media.ErrMgs)
-//	}
-//	mediaid = media.MediaID
-//	return
-//}
-
-func UploaImage(filePath string) (map[string]interface{}, error) {
+func UploadImage(filePath string) (map[string]interface{}, error) {
 	mapQr := make(map[string]interface{})
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
-
 	paramName := path.Base(filePath)
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -181,31 +87,4 @@ func UploaImage(filePath string) (map[string]interface{}, error) {
 	}
 	err = json.Unmarshal(b, &mapQr)
 	return mapQr, err
-}
-func newfileUploadRequest(uri string, paramName, path string) (*http.Request, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(paramName, path)
-	if err != nil {
-		return nil, err
-	}
-	// 这里的io.Copy实现,会把file文件都读取到内存里面，然后当做一个buffer传给NewRequest. 对于大文件来说会占用很多内存
-	_, err = io.Copy(part, file)
-
-	//for key, val := range params {
-	//	_ = writer.WriteField(key, val)
-	//}
-	err = writer.Close()
-	if err != nil {
-		return nil, err
-	}
-	request, err := http.NewRequest("POST", uri, body)
-	request.Header.Set("Content-Type", writer.FormDataContentType())
-	return request, err
 }

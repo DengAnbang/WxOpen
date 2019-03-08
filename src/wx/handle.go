@@ -93,13 +93,13 @@ func clickDispense(w http.ResponseWriter, m xmlutil.StringMap) {
 			return
 		}
 		defer os.Remove(filePath)
-		mapQr, err := UploaImage(filePath)
+
+		mapQr, err := UploadImage(filePath)
 		if err != nil {
 			loge.W(err)
 			w.Write([]byte(""))
 			return
 		}
-		loge.W(mapQr)
 		SendImageMessage(w, m, fmt.Sprint(mapQr["media_id"]))
 	}
 }
