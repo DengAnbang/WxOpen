@@ -8,12 +8,84 @@ import (
 	"net/http"
 	"sort"
 
+	"bytes"
+	"encoding/json"
+
 	"gitee.com/DengAnbang/WxOpen/src/code"
 	"gitee.com/DengAnbang/WxOpen/src/wx"
 	"gitee.com/DengAnbang/WxOpen/src/wx/xmlutil"
 	"gitee.com/DengAnbang/goutils/httpUtils"
 	"gitee.com/DengAnbang/goutils/loge"
 )
+
+func Test1(w http.ResponseWriter, r *http.Request) {
+	body := bytes.NewReader([]byte(`{
+   "touser":"oLg5g1U2t04ZWVejK9LtfJ_PHDMM",
+   "mpnews":{
+     "media_id":"u4DTvfet1YK-HS0vIjh7kV5I9jZMNYzOkDIgQ0hh-9B2pCusGOKAd_ZbwhqAik4j"
+    },
+   "msgtype":"mpnews"
+}`))
+	request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token="+wx.AccessTokenBean.AccessToken, body)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	resp, err := http.DefaultClient.Do(request)
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+
+	fmt.Fprint(w, string(b))
+}
+func Test(w http.ResponseWriter, r *http.Request) {
+	//tv4-O5UjqdhUjWCDCQ8i5cPl9kjYFwR3tkD42FJ7rmNQ2g_ZpWOMzECa2-43yEK6
+	image, err := wx.UploadImage(`E:\code\golang\src\gitee.com\DengAnbang\WxOpen\200812308231244_2.jpg`, false)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	article := make([]wx.Article, 0)
+	article = append(article, wx.Article{
+		ThumbMediaId:       fmt.Sprint(image["media_id"]),
+		Author:             "Author",
+		Title:              "title",
+		Content:            "Content",
+		ContentSourceUrl:   "www.baidu.com",
+		Digest:             "Digest",
+		NeedOpenComment:    1,
+		OnlyFansCanComment: 0,
+		ShowCoverPic:       1,
+	})
+	articles := wx.Articles{
+		Article: article,
+	}
+
+	bytess, err := json.Marshal(articles)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	fmt.Fprint(w, string(bytess))
+	body := bytes.NewReader(bytess)
+	request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/media/uploadnews?access_token="+wx.AccessTokenBean.AccessToken, body)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	resp, err := http.DefaultClient.Do(request)
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	fmt.Fprint(w, string(b))
+
+}
 
 //手动刷新AccessToken的接口，也会每2小时自动刷新一次
 func RefreshAccessToken(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +138,11 @@ func MenuCreate(w http.ResponseWriter, r *http.Request) {
 					Type: "click",
 					Name: "发送图文消息",
 					Key:  code.KEY_SEND_NEWS,
+				},
+				{
+					Type: "click",
+					Name: "发送文章消息",
+					Key:  code.KEY_SEND_ARTICLE,
 				},
 			},
 		},

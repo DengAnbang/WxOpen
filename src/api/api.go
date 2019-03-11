@@ -11,6 +11,8 @@ func Run(port string, mux *http.ServeMux) {
 	mux.HandleFunc("/", Authentication)
 	mux.HandleFunc("/refreshAccessToken", RefreshAccessToken)
 	mux.HandleFunc("/menuCreate", MenuCreate)
+	mux.HandleFunc("/test", Test)
+	mux.HandleFunc("/test1", Test1)
 	//mux.Handle(code.RootName, http.StripPrefix(code.RootName, FileHandler{}))
 	mux.Handle("/log/", http.StripPrefix("/log/", http.FileServer(http.Dir(code.LogRootPath))))
 	update.UpgradeService(":"+port, mux)

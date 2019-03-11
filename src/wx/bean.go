@@ -73,16 +73,31 @@ type ImageResponseBody struct {
 type NewsResponseBody struct {
 	BaseBody
 	ArticleCount int32
-	Articles     Articles
+	Articles     NewsArticles
 }
 
-type Articles struct {
-	Item ArticlesItem `xml:"item"`
+type NewsArticles struct {
+	Item NewsArticlesItem `xml:"item"`
 }
 
-type ArticlesItem struct {
+type NewsArticlesItem struct {
 	Title       CDATA
 	Description CDATA
 	PicUrl      CDATA
 	Url         CDATA
+}
+type Articles struct {
+	Article []Article `json:"articles"`
+}
+
+type Article struct {
+	ThumbMediaId       string `json:"thumb_media_id"`
+	Author             string `json:"author"`
+	Title              string `json:"title"`
+	ContentSourceUrl   string `json:"content_source_url"`
+	Content            string `json:"content"`
+	Digest             string `json:"digest"`
+	ShowCoverPic       int32  `json:"show_cover_pic"`
+	NeedOpenComment    int32  `json:"need_open_comment"`
+	OnlyFansCanComment int32  `json:"only_fans_can_comment"`
 }

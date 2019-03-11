@@ -8,6 +8,8 @@ import (
 
 	"os"
 
+	"bytes"
+
 	"gitee.com/DengAnbang/WxOpen/src/code"
 	"gitee.com/DengAnbang/WxOpen/src/wx/xmlutil"
 	"gitee.com/DengAnbang/goutils/loge"
@@ -44,12 +46,58 @@ func clickDispense(w http.ResponseWriter, m xmlutil.StringMap) {
 	case code.KEY_TEST_BUTTON:
 		SendMessage(w, m, fmt.Sprintf("你点击了：%s 按钮", "一个按钮"))
 	case code.KEY_SEND_NEWS:
-		articlesItem := ArticlesItem{Title: CDATA{Value: "这是标题"},
+		articlesItem := NewsArticlesItem{Title: CDATA{Value: "这是标题"},
 			Description: CDATA{Value: "这是标题的描述..."},
 			PicUrl:      CDATA{Value: "http://mmbiz.qpic.cn/mmbiz_jpg/hvWibETJA6ZON5sQMalx0NicA3rwFjbDoJERwJw1qrtDnAYWHqo5rhY6cScib1FXytuzNgZicCHAibMgcaE4ObGT2Bw/0"},
 			Url:         CDATA{Value: "https://www.baidu.com/"},
 		}
 		SendNewsMessage(w, m, articlesItem)
+	case code.KEY_SEND_ARTICLE:
+		image, err := UploadImage(`E:\code\golang\src\gitee.com\DengAnbang\WxOpen\200812308231244_2.jpg`, false)
+		if err != nil {
+			loge.W(err)
+			w.Write([]byte(""))
+			return
+		}
+		article := make([]Article, 0)
+		article = append(article, Article{
+			ThumbMediaId:       fmt.Sprint(image["media_id"]),
+			Author:             "Author",
+			Title:              "title",
+			Content:            "Content",
+			ContentSourceUrl:   "www.baidu.com",
+			Digest:             "Digest",
+			NeedOpenComment:    1,
+			OnlyFansCanComment: 0,
+			ShowCoverPic:       1,
+		})
+		articles := Articles{
+			Article: article,
+		}
+		stringMap := UploadArticleMessage(w, articles)
+		body := bytes.NewReader([]byte(fmt.Sprintf(`{
+   "touser":"%s",
+   "mpnews":{
+     "media_id":"%s"
+    },
+   "msgtype":"mpnews"
+}`, m["FromUserName"], stringMap["media_id"])))
+		request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token="+AccessTokenBean.AccessToken, body)
+		if err != nil {
+			loge.W(err)
+			w.Write([]byte(""))
+			return
+		}
+		resp, err := http.DefaultClient.Do(request)
+		defer resp.Body.Close()
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			loge.W(err)
+			w.Write([]byte(""))
+			return
+		}
+
+		fmt.Fprint(w, string(b))
 	case code.KEY_MATERIAL:
 		mapAny, err := GetUserMessage(m["FromUserName"])
 		if err != nil {
@@ -94,7 +142,7 @@ func clickDispense(w http.ResponseWriter, m xmlutil.StringMap) {
 		}
 		defer os.Remove(filePath)
 
-		mapQr, err := UploadImage(filePath)
+		mapQr, err := UploadImage(filePath, false)
 		if err != nil {
 			loge.W(err)
 			w.Write([]byte(""))

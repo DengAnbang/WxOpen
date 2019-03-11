@@ -55,7 +55,7 @@ func (accessToken *AccessToken) Refresh() error {
 	return nil
 }
 
-func UploadImage(filePath string) (map[string]interface{}, error) {
+func UploadImage(filePath string, isUrl bool) (map[string]interface{}, error) {
 	mapQr := make(map[string]interface{})
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -74,7 +74,11 @@ func UploadImage(filePath string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/media/upload?access_token="+AccessTokenBean.AccessToken+"&type=image", body)
+	s := "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=" + AccessTokenBean.AccessToken + "&type=image"
+	if isUrl {
+		s = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=" + AccessTokenBean.AccessToken
+	}
+	request, err := http.NewRequest("POST", s, body)
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 	resp, err := http.DefaultClient.Do(request)
 	if err != nil {
