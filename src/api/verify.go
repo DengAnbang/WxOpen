@@ -148,7 +148,13 @@ func MenuCreate(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	button := wx.Button{Menu: menus}
-	loge.W(wx.MenuCreate(button))
+	err := wx.MenuCreate(button)
+	if err != nil {
+		fmt.Fprintf(w, "更新按钮失败：%v", err)
+		loge.W(err)
+		return
+	}
+	fmt.Fprint(w, "更新按钮完成")
 
 }
 

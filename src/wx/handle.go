@@ -53,35 +53,36 @@ func clickDispense(w http.ResponseWriter, m xmlutil.StringMap) {
 		}
 		SendNewsMessage(w, m, articlesItem)
 	case code.KEY_SEND_ARTICLE:
-		image, err := UploadImage(`E:\code\golang\src\gitee.com\DengAnbang\WxOpen\200812308231244_2.jpg`, false)
-		if err != nil {
-			loge.W(err)
-			w.Write([]byte(""))
-			return
-		}
-		article := make([]Article, 0)
-		article = append(article, Article{
-			ThumbMediaId:       fmt.Sprint(image["media_id"]),
-			Author:             "Author",
-			Title:              "title",
-			Content:            "Content",
-			ContentSourceUrl:   "www.baidu.com",
-			Digest:             "Digest",
-			NeedOpenComment:    1,
-			OnlyFansCanComment: 0,
-			ShowCoverPic:       1,
-		})
-		articles := Articles{
-			Article: article,
-		}
-		stringMap := UploadArticleMessage(w, articles)
+		//image, err := UploadImage(`E:\code\golang\src\gitee.com\DengAnbang\WxOpen\200812308231244_2.jpg`, false)
+		//if err != nil {
+		//	loge.W(err)
+		//	w.Write([]byte(""))
+		//	return
+		//}
+		//article := make([]Article, 0)
+		//article = append(article, Article{
+		//	ThumbMediaId:       fmt.Sprint(image["media_id"]),
+		//	Author:             "Author",
+		//	Title:              "title",
+		//	Content:            "Content",
+		//	ContentSourceUrl:   "www.baidu.com",
+		//	Digest:             "Digest",
+		//	NeedOpenComment:    1,
+		//	OnlyFansCanComment: 0,
+		//	ShowCoverPic:       1,
+		//})
+		//articles := Articles{
+		//	Article: article,
+		//}
+		//stringMap := UploadArticleMessage(w, articles)
 		body := bytes.NewReader([]byte(fmt.Sprintf(`{
    "touser":"%s",
    "mpnews":{
      "media_id":"%s"
     },
    "msgtype":"mpnews"
-}`, m["FromUserName"], stringMap["media_id"])))
+}`, m["FromUserName"], "hoTY0K89H2Bd2JRVL9guIB4Fg35Y-13tSltj7bxkwcc0bHcGay5Y5NoAORI0f89A")))
+		//}`, m["FromUserName"], stringMap["media_id"])))
 		request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token="+AccessTokenBean.AccessToken, body)
 		if err != nil {
 			loge.W(err)
@@ -96,8 +97,8 @@ func clickDispense(w http.ResponseWriter, m xmlutil.StringMap) {
 			w.Write([]byte(""))
 			return
 		}
-
-		fmt.Fprint(w, string(b))
+		loge.WD(string(b))
+		//fmt.Fprint(w, string(b))
 	case code.KEY_MATERIAL:
 		mapAny, err := GetUserMessage(m["FromUserName"])
 		if err != nil {

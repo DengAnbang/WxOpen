@@ -34,25 +34,31 @@ func GetUserMessage(userName string) (map[string]interface{}, error) {
 创建公众号的菜单
 */
 func MenuCreate(button Button) error {
-	bytess, err := json.Marshal(button)
+	_, err := POST("https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+AccessTokenBean.AccessToken, button)
 	if err != nil {
 		return err
 	}
-	body := bytes.NewReader(bytess)
-	request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+AccessTokenBean.AccessToken, body)
+	return nil
+}
+func POST(url string, data interface{}) ([]byte, error) {
+	dataBytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	body := bytes.NewReader(dataBytes)
+	request, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		loge.W(err)
-		return err
+		return nil, err
 	}
 	resp, err := http.DefaultClient.Do(request)
 	defer resp.Body.Close()
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		loge.W(err)
-		return err
+		return nil, err
 	}
-	loge.W(string(b))
-	return nil
+	return b, nil
 }
 
 /**

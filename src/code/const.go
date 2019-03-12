@@ -17,7 +17,6 @@ var (
 )
 
 const (
-	KEY_SONG         = "KEY_SONG"         //今日歌曲
 	KEY_TEST_BUTTON  = "KEY_TEST_BUTTON"  //测试按钮
 	KEY_MATERIAL     = "KEY_MATERIAL"     //个人资料
 	KEY_SEND_NEWS    = "KEY_SEND_NEWS"    //发送图文信息

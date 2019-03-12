@@ -17,11 +17,11 @@ func SendMessage(w http.ResponseWriter, m xmlutil.StringMap, message string) {
 		BaseBody: GetReplyBaseBody("text", m),
 		Content:  CDATA{Value: message},
 	}
-	bytes, err := xml.Marshal(body)
-	s := string(bytes)
+	bytess, err := xml.Marshal(body)
+	s := string(bytess)
 	loge.W(s)
 	if err == nil {
-		w.Write(bytes)
+		w.Write(bytess)
 		return
 	}
 	loge.W(err)
@@ -33,10 +33,10 @@ func SendImageMessage(w http.ResponseWriter, m xmlutil.StringMap, MediaId string
 		BaseBody: GetReplyBaseBody("image", m),
 		Image:    struct{ MediaId CDATA }{MediaId: CDATA{Value: MediaId}},
 	}
-	bytes, err := xml.Marshal(body)
-	loge.W(string(bytes))
+	bytess, err := xml.Marshal(body)
+	loge.W(string(bytess))
 	if err == nil {
-		w.Write(bytes)
+		w.Write(bytess)
 		return
 	}
 	loge.W(err)
@@ -49,11 +49,11 @@ func SendNewsMessage(w http.ResponseWriter, m xmlutil.StringMap, articlesItem Ne
 		ArticleCount: 1,
 		Articles:     NewsArticles{Item: articlesItem},
 	}
-	bytes, err := xml.Marshal(body)
-	s := string(bytes)
+	bytess, err := xml.Marshal(body)
+	s := string(bytess)
 	loge.W(s)
 	if err == nil {
-		w.Write(bytes)
+		w.Write(bytess)
 		return
 	}
 	loge.W(err)
