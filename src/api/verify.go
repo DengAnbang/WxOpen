@@ -41,6 +41,10 @@ func Test1(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, string(b))
 }
+func Test2(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Fprint(w, "Test2")
+}
 func Test(w http.ResponseWriter, r *http.Request) {
 	//tv4-O5UjqdhUjWCDCQ8i5cPl9kjYFwR3tkD42FJ7rmNQ2g_ZpWOMzECa2-43yEK6
 	image, err := wx.UploadImage(`E:\code\golang\src\gitee.com\DengAnbang\WxOpen\200812308231244_2.jpg`, false)
@@ -166,6 +170,16 @@ func Authentication(w http.ResponseWriter, r *http.Request) {
 		nonce := httpUtils.GetValueFormRequest(r, "nonce")
 		echostr := httpUtils.GetValueFormRequest(r, "echostr")
 		slice := sort.StringSlice{timestamp, nonce, code.Token}
+		r.ParseForm()
+
+		loge.W("进入方法")
+		loge.W(r.Form)
+		loge.W(r.MultipartForm)
+		loge.W(r.URL)
+		loge.W(signature)
+		//loge.W(timestamp)
+		//loge.W(nonce)
+		//loge.W(echostr)
 		sort.Strings(slice)
 		str := ""
 		for _, s := range slice {
