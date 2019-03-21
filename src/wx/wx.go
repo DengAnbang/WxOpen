@@ -14,10 +14,11 @@ import (
 
 	"path"
 
-	"gitee.com/DengAnbang/WxOpen/src/code"
-	"gitee.com/DengAnbang/goutils/loge"
-	"gitee.com/DengAnbang/WxOpen/src/wx/xmlutil"
 	"encoding/xml"
+
+	"gitee.com/DengAnbang/WxOpen/src/code"
+	"gitee.com/DengAnbang/WxOpen/src/wx/xmlutil"
+	"gitee.com/DengAnbang/goutils/loge"
 )
 
 var AccessTokenBean AccessToken
@@ -98,13 +99,13 @@ func UploadImage(filePath string, isUrl bool) (map[string]interface{}, error) {
 /**
 上传素材
 */
-func UploadArticleMessage(w http.ResponseWriter, articles Articles) xmlutil.StringMap {
+func UploadArticleMessage(w http.ResponseWriter, articles Articles) (xmlutil.StringMap, error) {
 	stringMap := make(xmlutil.StringMap, 0)
 	bytess, err := json.Marshal(articles)
 	if err != nil {
 		loge.W(err)
 		w.Write([]byte(""))
-		return stringMap
+		return stringMap, err
 	}
 	//fmt.Fprint(w, string(bytess))
 	body := bytes.NewReader(bytess)
@@ -112,7 +113,7 @@ func UploadArticleMessage(w http.ResponseWriter, articles Articles) xmlutil.Stri
 	if err != nil {
 		loge.W(err)
 		w.Write([]byte(""))
-		return stringMap
+		return stringMap, err
 	}
 	resp, err := http.DefaultClient.Do(request)
 	defer resp.Body.Close()
@@ -121,14 +122,14 @@ func UploadArticleMessage(w http.ResponseWriter, articles Articles) xmlutil.Stri
 	if err != nil {
 		loge.W(err)
 		w.Write([]byte(""))
-		return stringMap
+		return stringMap, err
 	}
 
 	err = xml.Unmarshal(b, &stringMap)
 	if err != nil {
 		loge.W(err)
 		w.Write([]byte(""))
-		return stringMap
+		return stringMap, err
 	}
-	return stringMap
+	return stringMap, nil
 }

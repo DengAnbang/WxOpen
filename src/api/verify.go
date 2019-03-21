@@ -171,15 +171,6 @@ func Authentication(w http.ResponseWriter, r *http.Request) {
 		echostr := httpUtils.GetValueFormRequest(r, "echostr")
 		slice := sort.StringSlice{timestamp, nonce, code.Token}
 		r.ParseForm()
-
-		loge.W("进入方法")
-		loge.W(r.Form)
-		loge.W(r.MultipartForm)
-		loge.W(r.URL)
-		loge.W(signature)
-		//loge.W(timestamp)
-		//loge.W(nonce)
-		//loge.W(echostr)
 		sort.Strings(slice)
 		str := ""
 		for _, s := range slice {
@@ -194,15 +185,15 @@ func Authentication(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write([]byte(""))
 	} else if r.Method == "POST" {
-		bytes, err := ioutil.ReadAll(r.Body)
+		bytess, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			loge.W(err)
 			w.Write([]byte(""))
 			return
 		}
-		loge.WD(string(bytes))
+		loge.WD(string(bytess))
 		var messageBean xmlutil.StringMap
-		err = xml.Unmarshal(bytes, &messageBean)
+		err = xml.Unmarshal(bytess, &messageBean)
 		if err != nil {
 			loge.W(err)
 			w.Write([]byte(""))

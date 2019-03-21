@@ -16,10 +16,57 @@ import (
 	"gitee.com/DengAnbang/goutils/utils"
 )
 
+func asdad(w http.ResponseWriter, m xmlutil.StringMap, mediaId string) {
+	article := make([]Article, 0)
+	article = append(article, Article{
+		ThumbMediaId:       mediaId,
+		Author:             "Author",
+		Title:              "title",
+		Content:            "Content",
+		ContentSourceUrl:   "www.baidu.com",
+		Digest:             "Digest",
+		NeedOpenComment:    1,
+		OnlyFansCanComment: 0,
+		ShowCoverPic:       1,
+	})
+	articles := Articles{
+		Article: article,
+	}
+	stringMap ,err:= UploadArticleMessage(w, articles)
+	if err != nil {
+		loge.W(err)
+		w.Write([]byte(""))
+		return
+	}
+	body := bytes.NewReader([]byte(fmt.Sprintf(`{
+   "touser":"%s",
+   "mpnews":{
+     "media_id":"%s"
+    },
+   "msgtype":"mpnews"
+}`, m["FromUserName"], stringMap[""])))
+	//}`, m["FromUserName"], stringMap["media_id"])))
+	request, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token="+AccessTokenBean.AccessToken, body)
+	if err != nil {
+		loge.W(err)
+		w.Write([]byte(""))
+		return
+	}
+	resp, err := http.DefaultClient.Do(request)
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		loge.W(err)
+		w.Write([]byte(""))
+		return
+	}
+	loge.WD(string(b))
+}
 func Dispense(w http.ResponseWriter, m xmlutil.StringMap) {
 	switch m["MsgType"] {
 	case "image":
-		SendImageMessage(w, m, m["MediaId"])
+		asdad(w, m, m["MediaId"])
+		//SendImageMessage(w, m, m["MediaId"])
 	case "text":
 		SendMessage(w, m, fmt.Sprintf("我收到了消息：%s", m["Content"]))
 	case "event":
@@ -28,7 +75,6 @@ func Dispense(w http.ResponseWriter, m xmlutil.StringMap) {
 		} else if m["Event"] == "SCAN" {
 			scanDispense(w, m)
 		}
-
 	}
 }
 func scanDispense(w http.ResponseWriter, m xmlutil.StringMap) {
